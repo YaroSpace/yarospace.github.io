@@ -18,7 +18,7 @@ I have found that these tasks may become very repetitive and similar, sometimes 
 
 Let me illustrate:
 
-```
+```ruby
 def make_payment
   ..process and execute payment
 end
@@ -43,11 +43,11 @@ This will do  the job, but raises a few issues.
 
 From the point of view of statically typed languages, you should always return the same type. In this case, it can be a `NilObject` or `PaymentObject`.  Of course, ruby is more flexible, but it makes sense, because if you do not know the return type, then you should always be prepared for either of them, which means asserting the type of the result, in one way or another (and, in essence any conditional is basically doing `(..).is_a?(TrueClass)` ).  
 
-Now, functional languages have a wonderful concept of `SOME` (aka `MAYBE/EITHER`), which is a type that can hold either a value of some type or a nil (null, none, etc.).   So, whenever you see this type, you know that the result could have been nil and you process it accordingly. (In fact, some languages like ML enforce that you pattern match both cases)  
+Now, functional languages have a wonderful concept of `SOME` (aka `MAYBE/EITHER`), which is a container that can hold either a value of some type or a nil (null, none, etc.).   So, whenever you see this type, you know that the result could have been nil and you process it accordingly. (In fact, some languages like ML enforce that you pattern match both cases)  
 
 In ruby, we use a `NullObject` pattern for similar reasons - signal that the outcome could have been nil and provide means for procesing ressults in a uniform passion, regardless of the actual outcome and avoiding conditionals.
 
-```
+```ruby
 def make_payment(params)
   if(success)
     return NullPaymentObject
@@ -72,7 +72,7 @@ In the original example, we actually need to stop execution if a payment failed.
 There is another inconvenience: most often we would like to know, why the method failed, at least for logging purposes.  It would be nice, if our result carried some information with it.  
 This brought me to the idea of returning a `StatusObject`, which would carry the result of the method execution in case of success and reasons for failure, in case of failure.
 
-```
+```ruby
 class StatusObject
   def initialize()
     @status = :success
@@ -81,10 +81,12 @@ class StatusObject
   end
 
   def success!(result)
+    @status = :success
     @result = result
   end
 
   def fail!(error_details = {})
+    @status = :failure
     @error = error_details
   end
 end
