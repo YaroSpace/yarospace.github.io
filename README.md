@@ -1,4 +1,5 @@
 # yarospace.github.io
+
 My programming notes
 ==
 
@@ -8,7 +9,8 @@ I have tried a few programming languages and paradigms and I am constantly in th
 
 Sometimes, I have a feeling that I am a good programmer, but I a quick glance at the work of my greater colleagues is  enough to give me a cold shower and to remind me that I am the very beginning of the road.  Thus, your constructive criticism and advice is very welcome.
 
-February 2016
+February 2016 - In search for perfect return
+===
 
 I like to separate all the methods that I write into 3 logical parts: collect input, process data, provide output.
 
