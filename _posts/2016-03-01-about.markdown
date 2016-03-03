@@ -1,0 +1,11 @@
+---
+layout: post
+title:  "My programming notes"
+categories:
+---
+
+I am one of those people who believe that programming is their passion.  Moreover, among many other things I find programming to be an art, which allows individuals to express their vision of the world in code and experience aesthetic pleasure, both from the process of writing code and the end result.
+
+I have tried a few programming languages and paradigms and I am constantly in the search of yet a better way to express myself.  So far, my language of choice is Ruby and I am deeply influenced by SmallTalk and functional approach to programming.   I like to improve in everything I do and this blog is my reflection and thoughts about these improvements.
+
+Sometimes, I have a feeling that I am a good programmer, but I a quick glance at the work of my greater colleagues is  enough to give me a cold shower and to remind me that I am the very beginning of the road.  Thus, your constructive criticism and advice is very welcome.

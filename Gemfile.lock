@@ -125,6 +125,8 @@ PLATFORMS
 
 DEPENDENCIES
   github-pages
+  jekyll-paginate
+  redcarpet
 
 BUNDLED WITH
    1.11.2

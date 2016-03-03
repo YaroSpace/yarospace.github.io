@@ -1,24 +1,16 @@
 ---
-title: Document Center
+layout: page
+title: In search for a perfect return
+permalink: /search-for-return/
 ---
 
-# yarospace.github.io
+I like to separate all the methods that I write into 3 logical parts:
 
-My programming notes
-==
+`collect input` -> `process data` -> `provide output`
 
-I am one of those people who believe that programming is their passion.  Moreover, among many other things I find programming to be an art, which allows individuals to express their vision of the world in code and experience aesthetic pleasure, both from the process of writing code and the end result.
+I have found that collecting input and providing output may become very repetitive and often even duplicated.
 
-I have tried a few programming languages and paradigms and I am constantly in the search of yet a better way to express myself.  So far, my language of choice is Ruby and I am deeply influenced by SmallTalk and functional approach to programming.   I like to improve in everything I do and this blog is my reflection and thoughts about these improvements.
-
-Sometimes, I have a feeling that I am a good programmer, but I a quick glance at the work of my greater colleagues is  enough to give me a cold shower and to remind me that I am the very beginning of the road.  Thus, your constructive criticism and advice is very welcome.
-
-February 2016 - In search for a perfect return
-===
-
-I like to separate all the methods that I write into 3 logical parts: collect input, process data, provide output.
-
-I have found that these tasks may become very repetitive and similar, sometimes even duplicated.  One task that really bothers me is providing a result of the method that can be either used to make a subsequent decision or to be subsequently consumed by another method.  
+The task that really bothers me is providing a result of the method that can be either used to make a subsequent decision or to be subsequently consumed by another method.  
 
 Let me illustrate:
 
@@ -28,19 +20,19 @@ def make_payment
 end
 ```
 
+<!--break-->
+
 Very often we will need to assert the result to make a decision to continue further or not:
 
-`if make_payment then ..`
-
-or
-
-`return unless make_payment`
+`if make_payment then ..` or `return unless make_payment`
 
 So, in this case, returning a boolean will do the job.
 
 If payment has succeeded, we might need to feed the result of the payment into another method.
 
-`if (payment = make_payment) then register_payment(payment)`
+```ruby
+if (payment = make_payment) then register_payment(payment)
+```
 
 Ok, by relying on ruby's truthiness, we can return nil or payment result, e.g. `PaymentObject`.
 This will do  the job, but raises a few issues.
@@ -54,9 +46,9 @@ In ruby, we use a `NullObject` pattern for similar reasons - signal that the out
 ```ruby
 def make_payment(params)
   if(success)
-    return NullPaymentObject
+    NullPaymentObject.new
   else
-    return PaymentObject
+    PaymentObject.new
   end
 end
 
@@ -65,15 +57,14 @@ register_payment(make_payment(params))
 
 Since, both `NullPaymentObject` and `PaymentObject` have the same interface, we can just feed them on the next method, without thinking too much about the contents and, thus, eliminating the conditional.  (In fact, we can even wrap the result in a `GuaranteedPaymentObject` to return the same type)
 
-However, the NullObject pattern is more appropriate in situations, when we do not need to stop execution, 
+However, the NullObject pattern is more appropriate in situations, when we do not need to stop execution, e.g.  `display_user(get_current_user)`
 
-e.g. `display_user(get_current_user)`.  
-
-Here, we would still need to display somehting, even if there is no current user.  
+Here, we would still need to display somehting, even if there is no current user.
 
 In the original example, we actually need to stop execution if a payment failed.  In this case, we would still need an assertion of some kind, so returning nil is probably the most sensible solution, since a NullObject will be truthy in a conditional and things may become tricky (although, this hiccup can be dealt with).
 
 There is another inconvenience: most often we would like to know, why the method failed, at least for logging purposes.  It would be nice, if our result carried some information with it.  
+
 This brought me to the idea of returning a `StatusObject`, which would carry the result of the method execution in case of success and reasons for failure, in case of failure.
 
 ```ruby
@@ -94,24 +85,49 @@ class StatusObject
     @error = error_details
   end
 end
+```
 
+Now, we can use it like this:
+
+```ruby
 def make_payment(params)
   status = StatusObject.new
 
   if(..payment succeeded..)
-    return status.success!(result_of_method)
+    status.success!(result_of_method)
   else
-    return status.fail!(reasons_for_failure)
+    status.fail!(reasons_for_failure)
   end
 end
 
 status = make_payment(payment_params)
 
-if status.success? 
+if status.success?
   make_payment(status.result)
 else
   log status.errors
 end
+```
+
+or even like this:
+
+```ruby
+def make_payment(params)
+  status = StatusObject.new
+  (..payment succeeded..) ?  status.success!(result_of_method) : status.fail!(reasons_for_failure)
+end
+
+status = make_payment(payment_params)
+
+status.success? ?  register_payment(status.result) : log(status.errors)
+```
+
+or how about this:
+
+```ruby
+ make(payment)
+  .on_success { |status, result| register_payment(result) }
+  .on_failure { |status, error| log(error) }
 ```
 
 To be continued...
